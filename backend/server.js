@@ -1,23 +1,37 @@
 const express = require('express');
 const cors = require('cors');
+const { createClient } = require('@supabase/supabase-js');
+
 const app = express();
+
+// CONFIGURAZIONE SUPABASE (Sostituisci con i tuoi dati)
+const SUPABASE_URL = 'https://tuo-progetto.supabase.co';
+const SUPABASE_KEY = 'tua-chiave-anon-public';
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 app.use(cors());
 app.use(express.json());
 
-let messaggi = [{ text: "Funziona!" }];
-
-app.get('/api/messages', (req, res) => {
-    res.json(messaggi);
+// 1. GET: Legge i messaggi dal database
+app.get('/api/messages', async (req, res) => {
+    const { data, error } = await supabase
+        .from('messaggi') // Il nome della tabella creata su Supabase
+        .select('*');
+    
+    if (error) return res.status(500).json(error);
+    res.json(data);
 });
 
-app.post('/api/messages', (req, res) => {
-    messaggi.push(req.body);
-    res.json({ status: "Inviato" });
-});
-app.get('/', (req, res) => {
-    res.send("Il server è attivo e funzionante!");
+// 2. POST: Salva un nuovo messaggio nel database
+app.post('/api/messages', async (req, res) => {
+    const { data, error } = await supabase
+        .from('messaggi')
+        .insert([{ text: req.body.text }]); // Inserisce l'oggetto inviato dal frontend
+    
+    if (error) return res.status(500).json(error);
+    res.json({ status: "Messaggio salvato!" });
 });
 
-
-app.listen(3000, () => console.log("Server su http://localhost:3000"));
+// Avvio server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => console.log(`Server pronto sulla porta ${PORT}`));

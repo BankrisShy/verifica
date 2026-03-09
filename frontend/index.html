@@ -1,54 +1,77 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="it">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
     <title>Mio Compito</title>
     <style>
-        body { font-family: sans-serif; padding: 20px; }
-        .messaggio { background: #f4f4f4; margin: 5px 0; padding: 10px; border-radius: 5px; }
+      body {
+        font-family: sans-serif;
+        padding: 20px;
+      }
+      .messaggio {
+        background: #f4f4f4;
+        margin: 5px 0;
+        padding: 10px;
+        border-radius: 5px;
+      }
     </style>
-</head>
-<body>
+  </head>
+  <body>
     <h1>Messaggi dal Backend</h1>
-    
-    <input type="text" id="inputMessaggio" placeholder="Scrivi qualcosa...">
+
+    <input type="text" id="inputMessaggio" placeholder="Scrivi qualcosa..." />
     <button onclick="inviaDati()">Invia al Server</button>
     <button onclick="caricaDati()">Aggiorna Lista</button>
 
     <div id="listaMessaggi"></div>
 
     <script>
-        // ATTENZIONE: Per ora usiamo localhost. 
-        // Domani, una volta messo il backend su Render, cambierai questo URL.
-        const API_URL = "https://mio-backend-verifica.onrender.com/api/messages";
+      // ATTENZIONE: Per ora usiamo localhost.
+      // Domani, una volta messo il backend su Render, cambierai questo URL.
+      const API_URL = "https://mio-backend-verifica.onrender.com/api/messages";
 
-        async function caricaDati() {
-            const response = await fetch(API_URL);
-            const dati = await response.json();
-            
-            const div = document.getElementById('listaMessaggi');
-            div.innerHTML = ""; // Pulisce la lista
-            
-            dati.forEach(m => {
-                div.innerHTML += `<div class="messaggio">${m.text}</div>`;
-            });
+      // Funzione per CARICARE i dati
+      async function caricaDati() {
+        try {
+          const response = await fetch(API_URL);
+          const dati = await response.json();
+
+          const lista = document.getElementById("listaMessaggi");
+          lista.innerHTML = "";
+
+          // Supabase restituisce un array di oggetti, cicliamo su 'text'
+          dati.forEach((m) => {
+            const div = document.createElement("div");
+            div.className = "messaggio";
+            div.innerText = m.text;
+            lista.appendChild(div);
+          });
+        } catch (err) {
+          console.error("Errore nel caricamento:", err);
         }
+      }
 
-        async function inviaDati() {
-            const testo = document.getElementById('inputMessaggio').value;
-            
-            await fetch(API_URL, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ text: testo })
-            });
+      // Funzione per INVIARE i dati
+      async function inviaDati() {
+        const input = document.getElementById("inputMessaggio");
+        const nuovoMessaggio = { text: input.value };
 
-            document.getElementById('inputMessaggio').value = ""; // Svuota input
-            caricaDati(); // Ricarica la lista per vedere il nuovo messaggio
+        try {
+          await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(nuovoMessaggio),
+          });
+
+          input.value = ""; // Pulisce il campo
+          caricaDati(); // Aggiorna la lista subito
+        } catch (err) {
+          console.error("Errore nell'invio:", err);
         }
+      }
 
-        // Carica i dati appena si apre la pagina
-        caricaDati();
+      // Esegue il primo caricamento all'apertura
+      caricaDati();
     </script>
-</body>
+  </body>
 </html>
