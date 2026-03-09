@@ -15,5 +15,9 @@ app.post('/api/messages', (req, res) => {
     messaggi.push(req.body);
     res.json({ status: "Inviato" });
 });
+app.get('/', (req, res) => {
+    res.send("Il server è attivo e funzionante!");
+});
+
 
 app.listen(3000, () => console.log("Server su http://localhost:3000"));
