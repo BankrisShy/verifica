@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Mio Compito</title>
+    <style>
+        body { font-family: sans-serif; padding: 20px; }
+        .messaggio { background: #f4f4f4; margin: 5px 0; padding: 10px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Messaggi dal Backend</h1>
+    
+    <input type="text" id="inputMessaggio" placeholder="Scrivi qualcosa...">
+    <button onclick="inviaDati()">Invia al Server</button>
+    <button onclick="caricaDati()">Aggiorna Lista</button>
+
+    <div id="listaMessaggi"></div>
+
+    <script>
+        // ATTENZIONE: Per ora usiamo localhost. 
+        // Domani, una volta messo il backend su Render, cambierai questo URL.
+        const API_URL = "http://localhost:3000/api/messages";
+
+        async function caricaDati() {
+            const response = await fetch(API_URL);
+            const dati = await response.json();
+            
+            const div = document.getElementById('listaMessaggi');
+            div.innerHTML = ""; // Pulisce la lista
+            
+            dati.forEach(m => {
+                div.innerHTML += `<div class="messaggio">${m.text}</div>`;
+            });
+        }
+
+        async function inviaDati() {
+            const testo = document.getElementById('inputMessaggio').value;
+            
+            await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ text: testo })
+            });
+
+            document.getElementById('inputMessaggio').value = ""; // Svuota input
+            caricaDati(); // Ricarica la lista per vedere il nuovo messaggio
+        }
+
+        // Carica i dati appena si apre la pagina
+        caricaDati();
+    </script>
+</body>
+</html>
