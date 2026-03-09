@@ -5,8 +5,8 @@ const { createClient } = require('@supabase/supabase-js');
 const app = express();
 
 // CONFIGURAZIONE SUPABASE (Sostituisci con i tuoi dati)
-const SUPABASE_URL = 'https://tuo-progetto.supabase.co';
-const SUPABASE_KEY = 'tua-chiave-anon-public';
+const SUPABASE_URL = 'https://eyfqsteqbaqzuxgabzuy.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_oB99lrTn1sTNK3O1KoML1Q_meNnqNy-';
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 app.use(cors());
