@@ -2,49 +2,126 @@
 <html lang="it">
   <head>
     <meta charset="UTF-8" />
-    <title>Mio Compito</title>
+    <title>E-Commerce Distribuito</title>
     <style>
       body {
         font-family: sans-serif;
+        max-width: 800px;
+        margin: auto;
         padding: 20px;
+        background: #f0f2f5;
       }
-      .messaggio {
-        background: #f4f4f4;
-        margin: 5px 0;
-        padding: 10px;
-        border-radius: 5px;
+      .card {
+        background: white;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      button {
+        cursor: pointer;
+        background: #007bff;
+        color: white;
+        border: none;
+        padding: 8px 15px;
+        border-radius: 4px;
+      }
+      button:disabled {
+        background: #ccc;
+      }
+      .admin-section {
+        border-top: 2px solid #333;
+        margin-top: 40px;
+        padding-top: 20px;
+      }
+      input {
+        padding: 8px;
+        margin: 5px;
       }
     </style>
   </head>
   <body>
-    <h1>E-Commerce webpage</h1>
+    <h1>🛒 My Shop Online</h1>
+    <div class="card">
+      <strong>Il tuo Saldo: <span id="saldo">0</span> Crediti</strong>
+    </div>
 
-    <input type="text" id="inputMessaggio" placeholder="Scrivi qualcosa..." />
-    <button onclick="inviaDati()">Invia al Server</button>
-    <button onclick="caricaDati()">Aggiorna Lista</button>
+    <h2>Catalogo Prodotti</h2>
+    <div id="catalogo"></div>
 
-    <div id="listaMessaggi"></div>
+    <div class="admin-section">
+      <h2>🛠️ Dashboard Admin</h2>
+      <input type="text" id="adminNome" placeholder="Nome Prodotto" />
+      <input type="number" id="adminPrezzo" placeholder="Prezzo" />
+      <input type="number" id="adminStock" placeholder="Stock" />
+      <button onclick="aggiungiProdotto()">Aggiungi Prodotto</button>
+    </div>
 
     <script>
-      // ATTENZIONE: Per ora usiamo localhost.
-      // Domani, una volta messo il backend su Render, cambierai questo URL.
-      const API_URL = "https://mio-backend-verifica.onrender.com/api/messages";
+      const API_URL = "https://mio-backend-verifica.onrender.com/api/products"; // CAMBIA QUESTO URL
+      const UTENTE_ID = 1; // Simuliamo l'utente con ID 1
 
-      async function acquista(idProdotto) {
-        const res = await fetch(`${API_URL}/buy`, {
+      async function init() {
+        caricaSaldo();
+        caricaProdotti();
+      }
+
+      async function caricaSaldo() {
+        const res = await fetch(`${API_BASE}/user/${UTENTE_ID}`);
+        const user = await res.json();
+        document.getElementById("saldo").innerText = user.crediti;
+      }
+
+      async function caricaProdotti() {
+        const res = await fetch(`${API_BASE}/products`);
+        const prodotti = await res.json();
+        const div = document.getElementById("catalogo");
+        div.innerHTML = "";
+        prodotti.forEach((p) => {
+          div.innerHTML += `
+                    <div class="card">
+                        <div>
+                            <strong>${p.nome}</strong> - ${p.prezzo} Crediti<br>
+                            <small>Disponibili: ${p.stock}</small>
+                        </div>
+                        <button onclick="acquista(${p.id})" ${p.stock <= 0 ? "disabled" : ""}>
+                            ${p.stock <= 0 ? "Esaurito" : "Acquista"}
+                        </button>
+                    </div>`;
+        });
+      }
+
+      async function acquista(id) {
+        const res = await fetch(`${API_BASE}/buy`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prodottoId: idProdotto, utenteId: 1 }), // ID utente fisso per il test
+          body: JSON.stringify({ prodottoId: id, utenteId: UTENTE_ID }),
         });
-
         if (res.ok) {
-          alert("Acquisto effettuato!");
-          caricaCatalogo(); // Funzione che rifà la GET dei prodotti
+          alert("Acquisto riuscito!");
+          init();
         } else {
           const err = await res.json();
           alert("Errore: " + err.error);
         }
       }
+
+      async function aggiungiProdotto() {
+        const nome = document.getElementById("adminNome").value;
+        const prezzo = document.getElementById("adminPrezzo").value;
+        const stock = document.getElementById("adminStock").value;
+        await fetch(`${API_BASE}/admin/products`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ nome, prezzo, stock }),
+        });
+        init();
+      }
+
+      init();
     </script>
   </body>
 </html>
