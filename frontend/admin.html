@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard</title>
+    <style>body { font-family: sans-serif; padding: 20px; }</style>
+</head>
+<body>
+    <h1>🛠️ Admin Panel</h1>
+    <a href="index.html">← Torna allo Shop</a>
+    <hr>
+    <h3>Aggiungi Prodotto</h3>
+    <input type="text" id="nome" placeholder="Nome">
+    <input type="number" id="prezzo" placeholder="Prezzo">
+    <input type="number" id="stock" placeholder="Stock">
+    <button onclick="add()">Crea Prodotto</button>
+
+    <h3>Gestione Crediti</h3>
+    <input type="number" id="userId" placeholder="ID Utente">
+    <input type="number" id="bonus" placeholder="Crediti Bonus">
+    <button onclick="regala()">Invia Bonus</button>
+
+    <script>
+        const API_BASE = "https://mio-backend-verifica.onrender.com/api";
+
+        async function add() {
+            const body = { 
+                nome: document.getElementById('nome').value, 
+                prezzo: document.getElementById('prezzo').value, 
+                stock: document.getElementById('stock').value 
+            };
+            await fetch(`${API_BASE}/admin/products`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(body)
+            });
+            alert("Aggiunto!");
+        }
+
+        async function regala() {
+            const id = document.getElementById('userId').value;
+            const bonus = document.getElementById('bonus').value;
+            await fetch(`${API_BASE}/admin/bonus`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ utenteId: id, bonus: bonus })
+            });
+            alert("Bonus inviato!");
+        }
+    </script>
+</body>
+</html>

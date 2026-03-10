@@ -55,6 +55,26 @@ app.post('/api/admin/products', async (req, res) => {
     }
     res.json({ success: true });
 });
+// LOGIN SIMULATO
+app.post('/api/login', async (req, res) => {
+    const { username } = req.body;
+    const { data, error } = await supabase.from('utenti').select('*').eq('username', username).single();
+    if (error || !data) return res.status(404).json({ error: "Utente non trovato" });
+    res.json(data);
+});
+
+// ADMIN: REGALA CREDITI
+app.post('/api/admin/bonus', async (req, res) => {
+    const { utenteId, bonus } = req.body;
+    const { data: utente } = await supabase.from('utenti').select('*').eq('id', utenteId).single();
+    
+    const { error } = await supabase.from('utenti')
+        .update({ crediti: parseInt(utente.crediti) + parseInt(bonus) })
+        .eq('id', utenteId);
+        
+    res.json({ success: !error });
+});
+
 
 
 const PORT = process.env.PORT || 3000;
