@@ -42,10 +42,20 @@ app.post('/api/buy', async (req, res) => {
 
 // 4. ADMIN: AGGIUNGI/MODIFICA PRODOTTO
 app.post('/api/admin/products', async (req, res) => {
+    // Recupera i dati correttamente dal corpo della richiesta (req.body)
     const { nome, prezzo, stock } = req.body;
-    const { data, error } = await supabase.from('prodotti').insert([{ nomeProd, prezzo, stock }]);
-    res.json({ success: !error });
+
+    const { data, error } = await supabase
+        .from('prodotti')
+        .insert([{ nome, prezzo, stock }]); // Assicurati che i nomi qui siano corretti
+
+    if (error) {
+        console.error(error);
+        return res.status(500).json(error);
+    }
+    res.json({ success: true });
 });
+
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server e-commerce pronto su porta ${PORT}`));
