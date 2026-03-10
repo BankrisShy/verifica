@@ -11,8 +11,8 @@ Il server verifica che lo stock sia > 0 e che i crediti dell'utente siano suffic
 ## 4. Uso IA
 L'IA è stata utilizzata per la strutturazione del backend Node.js e per il debug della comunicazione CORS.
 ## 5. Link
-- Backend: [URL DI RENDER]
-- Frontend: [URL DI VERCEL/GITHUB PAGES]
+- Backend: [[URL DI RENDER](https://mio-backend-verifica.onrender.com/)]
+- Frontend: [[URL DI VERCEL/GITHUB PAGES](https://verifica-eta.vercel.app/index.html)]
 "Il sistema di login è implementato lato server (Thin Client).
  Il frontend invia le credenziali, ma è il backend che interroga il database PostgreSQL (Supabase) per convalidare l'esistenza dell'utente.
  Questo garantisce che la logica di accesso non sia manipolabile dall'utente finale."
