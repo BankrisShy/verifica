@@ -43,7 +43,7 @@ app.post('/api/buy', async (req, res) => {
 // 4. ADMIN: AGGIUNGI/MODIFICA PRODOTTO
 app.post('/api/admin/products', async (req, res) => {
     const { nome, prezzo, stock } = req.body;
-    const { data, error } = await supabase.from('prodotti').insert([{ nome, prezzo, stock }]);
+    const { data, error } = await supabase.from('prodotti').insert([{ nomeProd, prezzo, stock }]);
     res.json({ success: !error });
 });
 
