@@ -1,85 +1,126 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="it">
-<head>
-    <meta charset="UTF-8">
+  <head>
+    <meta charset="UTF-8" />
+    <nav>
+      <a href="index.html">Negozio</a> |
+      <a href="admin.html">Area Admin</a>
+    </nav>
+    <hr />
+
     <title>User Shop</title>
     <style>
-        body { font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; }
-        .card { background: white; border: 1px solid #ddd; padding: 15px; margin: 10px 0; border-radius: 8px; display: flex; justify-content: space-between; }
-        #shop-ui { display: none; } /* Nascosto finché non logghiamo */
-        .login-box { text-align: center; margin-top: 50px; }
+      body {
+        font-family: sans-serif;
+        max-width: 600px;
+        margin: auto;
+        padding: 20px;
+      }
+      .card {
+        background: white;
+        border: 1px solid #ddd;
+        padding: 15px;
+        margin: 10px 0;
+        border-radius: 8px;
+        display: flex;
+        justify-content: space-between;
+      }
+      #shop-ui {
+        display: none;
+      } /* Nascosto finché non logghiamo */
+      .login-box {
+        text-align: center;
+        margin-top: 50px;
+      }
     </style>
-</head>
-<body>
-
+  </head>
+  <body>
     <!-- BOX LOGIN -->
     <div id="login-ui" class="login-box">
-        <h1>Accedi allo Shop</h1>
-        <input type="text" id="usernameInput" placeholder="Inserisci il tuo username">
-        <button onclick="login()">Entra</button>
+      <h1>Accedi allo Shop</h1>
+      <input
+        type="text"
+        id="usernameInput"
+        placeholder="Inserisci il tuo username"
+      />
+      <button onclick="login()">Entra</button>
     </div>
 
     <!-- UI SHOP -->
     <div id="shop-ui">
-        <h1>Benvenuto, <span id="userDisplay"></span></h1>
-        <div class="card"><strong>Crediti: <span id="saldo">0</span></strong></div>
-        <div id="catalogo"></div>
-        <button onclick="logout()" style="background:red; color:white; margin-top:20px;">Esci</button>
+      <h1>Benvenuto, <span id="userDisplay"></span></h1>
+      <div class="card">
+        <strong>Crediti: <span id="saldo">0</span></strong>
+      </div>
+      <div id="catalogo"></div>
+      <button
+        onclick="logout()"
+        style="background: red; color: white; margin-top: 20px"
+      >
+        Esci
+      </button>
     </div>
 
     <script>
-        const API_BASE = "https://mio-backend-verifica.onrender.com/api";
-        let UTENTE_CORRENTE = null;
+      const API_BASE = "https://mio-backend-verifica.onrender.com/api";
+      let UTENTE_CORRENTE = null;
 
-        async function login() {
-            const user = document.getElementById('usernameInput').value;
-            const res = await fetch(`${API_BASE}/login`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ username: user })
-            });
+      async function login() {
+        const user = document.getElementById("usernameInput").value;
+        const res = await fetch(`${API_BASE}/login`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ username: user }),
+        });
 
-            if (res.ok) {
-                UTENTE_CORRENTE = await res.json();
-                document.getElementById('login-ui').style.display = "none";
-                document.getElementById('shop-ui').style.display = "block";
-                document.getElementById('userDisplay').innerText = UTENTE_CORRENTE.username;
-                caricaDati();
-            } else {
-                alert("Utente non trovato!");
-            }
+        if (res.ok) {
+          UTENTE_CORRENTE = await res.json();
+          document.getElementById("login-ui").style.display = "none";
+          document.getElementById("shop-ui").style.display = "block";
+          document.getElementById("userDisplay").innerText =
+            UTENTE_CORRENTE.username;
+          caricaDati();
+        } else {
+          alert("Utente non trovato!");
         }
+      }
 
-        async function caricaDati() {
-            // Ricarica saldo
-            const resU = await fetch(`${API_BASE}/user/${UTENTE_CORRENTE.id}`);
-            const dataU = await resU.json();
-            document.getElementById('saldo').innerText = dataU.crediti;
+      async function caricaDati() {
+        // Ricarica saldo
+        const resU = await fetch(`${API_BASE}/user/${UTENTE_CORRENTE.id}`);
+        const dataU = await resU.json();
+        document.getElementById("saldo").innerText = dataU.crediti;
 
-            // Ricarica catalogo
-            const resP = await fetch(`${API_BASE}/products`);
-            const prodotti = await resP.json();
-            const div = document.getElementById('catalogo');
-            div.innerHTML = "";
-            prodotti.forEach(p => {
-                div.innerHTML += `
+        // Ricarica catalogo
+        const resP = await fetch(`${API_BASE}/products`);
+        const prodotti = await resP.json();
+        const div = document.getElementById("catalogo");
+        div.innerHTML = "";
+        prodotti.forEach((p) => {
+          div.innerHTML += `
                 <div class="card">
                     <span>${p.nome} (${p.prezzo} cr) - Stock: ${p.stock}</span>
-                    <button onclick="acquista(${p.id})" ${p.stock <= 0 ? 'disabled' : ''}>Compra</button>
+                    <button onclick="acquista(${p.id})" ${p.stock <= 0 ? "disabled" : ""}>Compra</button>
                 </div>`;
-            });
-        }
+        });
+      }
 
-        async function acquista(prodottoId) {
-            const res = await fetch(`${API_BASE}/buy`, {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ prodottoId, utenteId: UTENTE_CORRENTE.id })
-            });
-            if (res.ok) { caricaDati(); } else { alert("Errore acquisto!"); }
+      async function acquista(prodottoId) {
+        const res = await fetch(`${API_BASE}/buy`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prodottoId, utenteId: UTENTE_CORRENTE.id }),
+        });
+        if (res.ok) {
+          caricaDati();
+        } else {
+          alert("Errore acquisto!");
         }
+      }
 
-        function logout() { location.reload(); }
+      function logout() {
+        location.reload();
+      }
     </script>
-</body>
+  </body>
 </html>
